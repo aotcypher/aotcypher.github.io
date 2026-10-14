@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>윤해성 포트폴리오</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="보안 인프라 구축과 운영 포트폴리오. OPNsense 기반 게임 QA 협업 시스템 CheckPoint를 중심으로 정리했습니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 한 줄 기술 문서. 왼쪽에 라벨 열, 오른쪽에 본문. 핵심은 2차 프로젝트의 규칙표와 검증표 */
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --ink: #16212b;
+  --muted: #586572;
+  --line: #d9dfe5;
+  --accent: #2350c4;
+  --accent-soft: #e6ecfa;
+  --pass: #1d7a4c;
+  --pass-soft: #e3f2ea;
+  --block: #b8402c;
+  --block-soft: #f8e7e3;
+  --font-body: "IBM Plex Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10171e; --surface: #17212b; --ink: #e5ecf2; --muted: #9babb8; --line: #2b3946;
+    --accent: #86a6ff; --accent-soft: #1d2b4a; --pass: #62c890; --pass-soft: #163327;
+    --block: #f08a74; --block-soft: #3a1f1a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10171e; --surface: #17212b; --ink: #e5ecf2; --muted: #9babb8; --line: #2b3946;
+  --accent: #86a6ff; --accent-soft: #1d2b4a; --pass: #62c890; --pass-soft: #163327;
+  --block: #f08a74; --block-soft: #3a1f1a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body);
+  font-size: 16px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere;
+}
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.3; margin: 0; }
+p { margin: 0; }
+.mono { font-family: var(--font-mono); }
+.label {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* 머리 */
+header.top { padding-block: 56px 40px; border-bottom: 1px solid var(--line); }
+header.top .wrap { display: grid; gap: 28px; }
+.name { font-size: clamp(34px, 6vw, 52px); font-weight: 700; letter-spacing: -.01em; }
+.role { font-size: clamp(18px, 2.6vw, 22px); color: var(--muted); font-weight: 500; margin-top: 6px; }
+.intro { max-width: 62ch; font-size: 17px; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.facts div { background: var(--surface); padding: 14px 16px; min-width: 0; }
+.facts b { display: block; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.facts span { font-size: 13px; color: var(--muted); }
+nav.toc { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; }
+nav.toc a { text-decoration: none; color: var(--ink); border-bottom: 1px solid var(--line); }
+nav.toc a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* 구역 */
+section.block { padding-block: 56px; border-bottom: 1px solid var(--line); }
+.sec-head { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; align-items: baseline; margin-bottom: 28px; }
+.sec-head h2 { font-size: clamp(24px, 3.4vw, 30px); font-weight: 700; }
+.sec-head .sub { color: var(--muted); margin-top: 6px; max-width: 64ch; }
+.row { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; margin-top: 36px; }
+.row > .label { padding-top: 4px; }
+.row > div { min-width: 0; }
+h3 { font-size: 19px; font-weight: 600; margin-bottom: 10px; }
+.body p + p { margin-top: 10px; }
+ul.list { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+.award {
+  display: inline-flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600;
+  background: var(--accent-soft); color: var(--accent); padding: 3px 10px; border-radius: 3px;
+}
+
+/* 표 */
+.tbl { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12.5px; font-weight: 600; color: var(--muted); background: var(--bg); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rule td:first-child, .rule td:nth-child(2), .rule td:nth-child(3) { font-family: var(--font-mono); font-size: 13.5px; white-space: nowrap; }
+.chip { font-family: var(--font-mono); font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+.chip.pass { background: var(--pass-soft); color: var(--pass); }
+.chip.block { background: var(--block-soft); color: var(--block); }
+.note { font-size: 13.5px; color: var(--muted); margin-top: 10px; }
+
+/* 구성도 */
+.diagram { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); padding: 12px; }
+.diagram svg { display: block; min-width: 760px; width: 100%; height: auto; }
+.d-box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.d-hub { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.d-cell { fill: var(--surface); stroke: var(--accent); stroke-width: 1; }
+.d-zone { fill: var(--bg); stroke: var(--line); stroke-width: 1; }
+.d-t { fill: var(--ink); font-family: var(--font-body); font-size: 14px; font-weight: 600; }
+.d-s { fill: var(--muted); font-family: var(--font-mono); font-size: 11.5px; }
+.d-z { fill: var(--muted); font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+.d-line { stroke: var(--accent); stroke-width: 1.5; fill: none; }
+.d-dash { stroke: var(--block); stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+.d-red { fill: var(--block); font-family: var(--font-mono); font-size: 11.5px; }
+
+/* 사례 */
+.cases { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.case { background: var(--surface); border: 1px solid var(--line); padding: 20px 22px; min-width: 0; display: grid; gap: 10px; align-content: start; }
+.case h4 { margin: 0; font-size: 16.5px; font-weight: 600; line-height: 1.45; }
+.case dl { margin: 0; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 6px 10px; font-size: 14.5px; }
+.case dt { font-family: var(--font-mono); font-size: 12px; color: var(--muted); padding-top: 3px; }
+.case dd { margin: 0; }
+
+/* 학습 흐름 */
+.timeline { display: grid; gap: 0; border-left: 2px solid var(--line); margin-left: 6px; }
+.tl { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; padding: 10px 0 10px 20px; position: relative; }
+.tl::before { content: ""; position: absolute; left: -6px; top: 18px; width: 10px; height: 10px; border-radius: 50%; background: var(--surface); border: 2px solid var(--muted); }
+.tl.proj::before { background: var(--accent); border-color: var(--accent); }
+.tl .d { font-family: var(--font-mono); font-size: 13px; color: var(--muted); padding-top: 2px; font-variant-numeric: tabular-nums; }
+.tl .c { min-width: 0; }
+.tl .c b { font-weight: 600; }
+.tl .tools { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+
+.skills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; }
+.skills div { min-width: 0; }
+.skills b { display: block; font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+
+footer { padding-block: 32px 48px; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 760px) {
+  .sec-head, .row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cases, .skills { grid-template-columns: minmax(0, 1fr); }
+  .tl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  header.top { padding-block: 36px 28px; }
+  section.block { padding-block: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div>
+      <div class="label">Portfolio 2026</div>
+      <h1 class="name">윤해성</h1>
+      <p class="role">보안 인프라 구축과 운영</p>
+    </div>
+    <p class="intro">여러 담당자가 만든 서버를 하나의 검증 가능한 시스템으로 묶는 일을 했습니다. 2차 프로젝트에서 PM과 OPNsense 네트워크 보안을 맡아 VPN, 방화벽, 웹 방화벽, 침입 탐지, 로그, 백업을 연결했고, 설정이 있다는 것과 실제로 동작한다는 것을 따로 시험해 증빙으로 남겼습니다.</p>
+    <div class="facts">
+      <div><b>736시간</b><span>이스트캠프 정보보호 및 보안 인프라 운영 관리 과정</span></div>
+      <div><b>3건</b><span>팀 프로젝트 (설계, 구축, 포렌식)</span></div>
+      <div><b>1등</b><span>1차 프로젝트 최우수 (2026.07.01)</span></div>
+      <div><b>7대</b><span>2차에서 연결한 서버 (OPNsense 포함)</span></div>
+    </div>
+    <nav class="toc" aria-label="목차">
+      <a href="#checkpoint">2차 CheckPoint</a>
+      <a href="#egg">1차 Team EGG</a>
+      <a href="#techhive">3차 TechHive</a>
+      <a href="#learning">학습 흐름</a>
+      <a href="#skills">기술</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="block" id="checkpoint">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">Project 02<br>2026.08.03 ~ 08.25</div>
+      <div>
+        <h2>게임 QA 협업 시스템 CheckPoint</h2>
+        <p class="sub">게임에서 결함을 재현하고, 그 로그를 Graylog에서 찾아, 웹 협업 시스템의 이슈로 처리한 뒤 백업 복원까지 보여 주는 내부망 시스템을 5명이 3주 동안 구축했습니다.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">맡은 일</div>
+      <div class="body">
+        <p><b>PM</b>으로 일정과 WBS, 회의록, 팀원 보고서 통합, 발표와 시연 영상을 맡았고, <b>OPNsense 담당</b>으로 WireGuard 사설망, 서버별 최소 허용 방화벽, HTTPS 리버스 프록시, NAXSI 웹 방화벽, Suricata 침입 탐지, Graylog 연계, 설정 백업과 복원을 직접 구축하고 검증했습니다.</p>
+        <p>웹, 게임, DB, 로그, 백업 서버는 팀원이 각자 맡았고, 저는 그 사이의 통신과 보안 정책을 정하고 실제 출발지에서 종단 시험을 했습니다.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">구성</div>
+      <div>
+        <div class="diagram" role="img" aria-label="OPNsense를 중심으로 외부, 팀원 PC, 서버 6대가 WireGuard로 연결된 구성도">
+          <svg viewBox="0 0 960 470" xmlns="http://www.w3.org/2000/svg">
+            <rect class="d-box" x="20" y="16" width="270" height="66" rx="4"/>
+            <text class="d-t" x="36" y="42">외부 인터넷</text>
+            <text class="d-s" x="36" y="64">UDP 51820만 허용, TCP 80, 443 닫음</text>
+            <rect class="d-box" x="345" y="16" width="270" height="66" rx="4"/>
+            <text class="d-t" x="361" y="42">팀원 PC 5대</text>
+            <text class="d-s" x="361" y="64">WireGuard 피어, DNS와 HTTPS만</text>
+            <rect class="d-box" x="670" y="16" width="270" height="66" rx="4"/>
+            <text class="d-t" x="686" y="42">관리자 PC</text>
+            <text class="d-s" x="686" y="64">관리 경로 분리</text>
+            <path class="d-line" d="M155 82 V128 M480 82 V128 M805 82 V128"/>
+
+            <rect class="d-hub" x="20" y="128" width="920" height="128" rx="4"/>
+            <text class="d-t" x="36" y="154">OPNsense 중앙 보안 게이트웨이</text>
+            <text class="d-s" x="300" y="154">wg0 10.77.0.254/24</text>
+            <rect class="d-cell" x="36" y="170" width="212" height="70" rx="3"/>
+            <text class="d-t" x="50" y="196">WireGuard, PF</text>
+            <text class="d-s" x="50" y="218">출발지 /32, 목적지 /32</text>
+            <rect class="d-cell" x="260" y="170" width="212" height="70" rx="3"/>
+            <text class="d-t" x="274" y="196">Nginx HTTPS</text>
+            <text class="d-s" x="274" y="218">ACME 인증서, HSTS</text>
+            <rect class="d-cell" x="484" y="170" width="212" height="70" rx="3"/>
+            <text class="d-t" x="498" y="196">NAXSI 웹 방화벽</text>
+            <text class="d-s" x="498" y="218">기본 BLOCK, 2개 경로 학습</text>
+            <rect class="d-cell" x="708" y="170" width="216" height="70" rx="3"/>
+            <text class="d-t" x="722" y="196">Suricata IDS</text>
+            <text class="d-s" x="722" y="218">wg0 탐지, 로그 전송</text>
+            <path class="d-line" d="M120 256 V300 M360 256 V300 M600 256 V300 M840 256 V300"/>
+
+            <rect class="d-zone" x="20" y="300" width="210" height="150" rx="4"/>
+            <text class="d-z" x="34" y="322">애플리케이션</text>
+            <rect class="d-box" x="34" y="332" width="182" height="46" rx="3"/>
+            <text class="d-t" x="46" y="352">WEB-SERVER</text><text class="d-s" x="46" y="370">10.77.0.1  QA 협업 웹</text>
+            <rect class="d-box" x="34" y="388" width="182" height="46" rx="3"/>
+            <text class="d-t" x="46" y="408">GAME-SERVER</text><text class="d-s" x="46" y="426">10.77.0.2  모의 게임</text>
+
+            <rect class="d-zone" x="256" y="300" width="210" height="150" rx="4"/>
+            <text class="d-z" x="270" y="322">데이터베이스</text>
+            <rect class="d-box" x="270" y="332" width="182" height="46" rx="3"/>
+            <text class="d-t" x="282" y="352">WEB-DB</text><text class="d-s" x="282" y="370">10.77.0.5  MariaDB</text>
+            <rect class="d-box" x="270" y="388" width="182" height="46" rx="3"/>
+            <text class="d-t" x="282" y="408">GAME-DB</text><text class="d-s" x="282" y="426">10.77.0.3  MariaDB</text>
+
+            <rect class="d-zone" x="492" y="300" width="210" height="150" rx="4"/>
+            <text class="d-z" x="506" y="322">로그 관제</text>
+            <rect class="d-box" x="506" y="332" width="182" height="102" rx="3"/>
+            <text class="d-t" x="518" y="352">LOG-SERVER</text><text class="d-s" x="518" y="370">10.77.0.4</text>
+            <text class="d-s" x="518" y="394">Graylog, OpenSearch</text><text class="d-s" x="518" y="412">5044, 1514, 9000/TCP</text>
+
+            <rect class="d-zone" x="728" y="300" width="212" height="150" rx="4"/>
+            <text class="d-z" x="742" y="322">백업</text>
+            <rect class="d-box" x="742" y="332" width="184" height="102" rx="3"/>
+            <text class="d-t" x="754" y="352">BACKUP-SERVER</text><text class="d-s" x="754" y="370">10.77.0.6</text>
+            <text class="d-s" x="754" y="394">Pull 회수, GPG</text><text class="d-s" x="754" y="412">SHA-256 manifest</text>
+          </svg>
+        </div>
+        <p class="note">모든 서버는 WireGuard 터널로만 연결되고, 서버 사이 통신도 OPNsense 방화벽 정책을 거칩니다. 인터넷에는 서비스를 공개하지 않았습니다.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">방화벽 정책</div>
+      <div>
+        <h3>필요한 통신만, 출발지와 목적지를 한 대씩 지정</h3>
+        <div class="tbl">
+          <table class="rule">
+            <thead><tr><th>출발지</th><th>목적지</th><th>포트</th><th>용도</th><th>결과</th></tr></thead>
+            <tbody>
+              <tr><td>GAME .2</td><td>GAME-DB .3</td><td>TCP 3306</td><td>게임 상태 저장</td><td><span class="chip pass">허용</span></td></tr>
+              <tr><td>WEB .1</td><td>WEB-DB .5</td><td>TCP 3306</td><td>계정, 권한, 이슈 데이터</td><td><span class="chip pass">허용</span></td></tr>
+              <tr><td>서버 4대</td><td>LOG .4</td><td>TCP 5044</td><td>Filebeat 로그 전송</td><td><span class="chip pass">허용</span></td></tr>
+              <tr><td>OPNsense</td><td>LOG .4</td><td>TCP 1514</td><td>방화벽, NAXSI, Suricata 로그</td><td><span class="chip pass">허용</span></td></tr>
+              <tr><td>WEB .1</td><td>LOG .4</td><td>TCP 9000</td><td>Graylog 읽기 전용 검색</td><td><span class="chip pass">허용</span></td></tr>
+              <tr><td>BACKUP .6</td><td>DB .3, .5</td><td>TCP 3306</td><td>DB 덤프 회수</td><td><span class="chip pass">허용</span></td></tr>
+              <tr><td>BACKUP .6</td><td>OPNsense</td><td>TCP 8888</td><td>설정 XML 회수 (전용 API 계정)</td><td><span class="chip pass">허용</span></td></tr>
+              <tr><td>WEB .1</td><td>GAME-DB .3</td><td>TCP 3306</td><td>다른 서비스의 DB</td><td><span class="chip block">차단 확인</span></td></tr>
+              <tr><td>LOG .4</td><td>WEB-DB .5</td><td>TCP 3306</td><td>로그 서버에서 DB 접근</td><td><span class="chip block">차단 확인</span></td></tr>
+              <tr><td>BACKUP .6</td><td>WEB .1</td><td>TCP 80</td><td>백업 서버에서 웹 원본 접근</td><td><span class="chip block">차단 확인</span></td></tr>
+              <tr><td>외부 PC</td><td>WAN</td><td>DB 포트</td><td>VPN 밖에서 DB 노출 여부</td><td><span class="chip block">차단 확인</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">허용 규칙만으로는 최소 권한을 증명할 수 없어서, 대표적인 미허용 경로를 실제 출발지에서 시도해 막히는 것까지 확인했습니다. 수행보고서에는 외부 1건과 사용자 PC에서 서버로 가는 6건, 모두 7개 경로의 차단 시험을 넣었습니다.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">검증 결과</div>
+      <div>
+        <div class="tbl">
+          <table>
+            <thead><tr><th>시험</th><th>결과</th><th>조건</th></tr></thead>
+            <tbody>
+              <tr><td>NAXSI 웹 방화벽</td><td class="num">오탐 0/100<br>탐지 180/200</td><td>OWASP ZAP 표본, 공격 유형 9/10 탐지, Graylog 도달 205/205</td></tr>
+              <tr><td>NAXSI 차단 전환 후</td><td class="num">차단 3/3<br>정상 8/8</td><td>보호 경로 표본 차단, 학습 경로 2/2 통과, 정상 기능 회귀</td></tr>
+              <tr><td>Suricata IDS</td><td class="num">오탐 0/100<br>규칙 8/8</td><td>정상 요청 경고 0건, 활성 규칙 일치, 예상 이벤트 Graylog 36/36</td></tr>
+              <tr><td>OWASP ZAP 재시험</td><td class="num">High 0건</td><td>인증 후 4,966개 메시지, High 후보 2건을 운영 코드와 대조해 오탐 판정</td></tr>
+              <tr><td>정상 HTTPS 부하</td><td class="num">270건<br>오류 0%</td><td>동시 10, 30, 50 단계, NAXSI 학습 모드와 Suricata 활성 상태</td></tr>
+              <tr><td>OPNsense 설정 복원</td><td class="num">14분 23초</td><td>격리 시험 VM에 복원, 목표 2시간. 규칙 26개, 사용자, 인증서, WireGuard 확인</td></tr>
+              <tr><td>DB와 로그 복원</td><td class="num">8, 6 테이블<br>21/21 샤드</td><td>WEB-DB 8개 테이블, GAME-DB 6개 테이블, OpenSearch 문서 316,106개</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">문제 해결</div>
+      <div class="cases">
+        <article class="case">
+          <h4>ZAP이 High 경고를 냈다. 정말 취약점일까</h4>
+          <dl>
+            <dt>상황</dt><dd>인증 후 고강도 스캔에서 SQL Injection High 후보가 나왔습니다.</dd>
+            <dt>판단</dt><dd>첫 시험의 후보 16건은 실제 응답을 보니 요청 제한(429), 로그인 이동(302), 로그인 화면(200)이었습니다. 재시험의 후보 2건은 운영 배포본의 코드에서 Prepared Statement와 파라미터 바인딩을 확인했습니다.</dd>
+            <dt>결과</dt><dd>확인된 High 0건. 도구 경고는 응답, 로그, 코드로 대조한 뒤에 결론을 냈습니다.</dd>
+          </dl>
+        </article>
+        <article class="case">
+          <h4>웹 방화벽을 언제 차단 모드로 바꿀까</h4>
+          <dl>
+            <dt>상황</dt><dd>바로 차단하면 정상 기능이 막힐 수 있고, 학습 모드로만 두면 막지 못합니다.</dd>
+            <dt>판단</dt><dd>학습 모드에서 정상 100건과 공격형 200건을 흘려 오탐과 탐지율을 먼저 쟀습니다. 탐지가 몰리는 로그 검색과 이슈 생성 두 경로만 학습 모드로 남겼습니다.</dd>
+            <dt>결과</dt><dd>나머지 전체를 BLOCK으로 전환하고 차단 3/3, 정상 회귀 8/8을 확인했습니다.</dd>
+          </dl>
+        </article>
+        <article class="case">
+          <h4>Suricata가 일반 공격 200건을 하나도 잡지 못했다</h4>
+          <dl>
+            <dt>상황</dt><dd>ZAP의 일반 공격형 요청 200건에서 Suricata 경고가 0건이었습니다.</dd>
+            <dt>판단</dt><dd>장애가 아니라 시그니처 범위의 차이였습니다. 웹 공격은 NAXSI와 웹 애플리케이션 통제가 맡고, Suricata는 활성 규칙 8/8 일치로 탐지 경로를 검증했습니다.</dd>
+            <dt>결과</dt><dd>미탐 결과를 숨기지 않고 한계로 보고서에 적었습니다. 승인 없이 IPS 차단 모드로 바꾸지 않았습니다.</dd>
+          </dl>
+        </article>
+        <article class="case">
+          <h4>백업 파일이 있다고 복원되는 것은 아니다</h4>
+          <dl>
+            <dt>상황</dt><dd>백업 서버가 각 서버에 접속해야 하므로 백업 경로가 새로운 공격 경로가 될 수 있었습니다.</dd>
+            <dt>판단</dt><dd>백업 서버가 제한 계정으로 가져오는 Pull 방식으로 정하고 역방향 규칙은 만들지 않았습니다. OPNsense에는 백업 전용 계정과 API 키를 두고 출발지를 백업 서버 한 대로 묶었습니다.</dd>
+            <dt>결과</dt><dd>암호화된 설정을 격리 VM에서 복호화해 해시를 대조하고 실제로 복원해 14분 23초를 측정했습니다.</dd>
+          </dl>
+        </article>
+        <article class="case">
+          <h4>로그 저장소가 인증 없이 열려 있었다</h4>
+          <dl>
+            <dt>상황</dt><dd>백업 상태 확인을 위해 열어야 할 OpenSearch 9200 포트가 평문 HTTP, 무인증 상태였습니다.</dd>
+            <dt>판단</dt><dd>로그 서버에서 백업 서버로 가던 SSH 규칙을 지우고, 백업 서버에서 9200으로 가는 규칙 하나로 바꿨습니다. TLS와 계정 분리 계획을 함께 검토했고 로그 담당자가 적용했습니다.</dd>
+            <dt>결과</dt><dd>무인증 접근 401, 역할별 계정 분리, 자동 스냅샷 성공을 확인했습니다.</dd>
+          </dl>
+        </article>
+        <article class="case">
+          <h4>각자 완료라는데 연결하면 안 된다</h4>
+          <dl>
+            <dt>상황</dt><dd>담당자별 완료 보고는 설정 기준이었고, 실제 출발지에서 기능과 로그 저장까지 확인한 것은 아니었습니다.</dd>
+            <dt>판단</dt><dd>완료를 연결, 기능, 로그 저장, 복원의 단계로 나누고 실제 출발지에서 다시 시험했습니다. 여러 기록이 충돌하면 최근의 실제 시험 결과를 기준으로 통합 기준본을 하나 만들었습니다.</dd>
+            <dt>결과</dt><dd>보고서의 표 한 칸까지 설정, 시험 결과, 증빙과 연결했습니다.</dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">PM으로 한 일</div>
+      <div class="body">
+        <ul class="list">
+          <li>WBS와 회의록을 실제 적용 결과와 대조해 관리하고, 담당자별 잔여 작업을 실행 지시문으로 나눴습니다.</li>
+          <li>팀원 인프라 보고서 6종을 하나의 인프라 구축 보고서로 통합하고, 수행 결과 보고서의 네트워크와 보안 파트를 썼습니다.</li>
+          <li>OPNsense를 처음부터 다시 만들 수 있도록 설치부터 백업, 복원까지 담은 인수인계서를 썼습니다.</li>
+          <li>25분 발표를 문제, 설계, 구축, 검증, 성과 순서로 구성하고, 시연 영상을 6차까지 편집했습니다.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">돌아보면</div>
+      <div class="body">
+        <p>서버를 설치하는 것보다 서로 다른 담당 영역을 하나로 연결해 검증하는 일이 훨씬 어려웠습니다. 완료 기준을 프로젝트 후반에야 통일해서 검토와 문서 작업이 PM에게 몰렸습니다. 다음에는 처음부터 담당자마다 기능 동작, 다른 영역과의 종단 연동, 정상과 실패 시험 증빙, 보고서에 바로 쓸 결과 정리의 네 가지를 마친 상태로 인계하도록 운영하려고 합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="egg">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">Project 01<br>2026.06.18 ~ 07.01</div>
+      <div>
+        <h2>넥슨 에센셜 스토어 인프라 보안 설계</h2>
+        <p class="sub">메이플스토리 캐릭터 API로 굿즈를 주문 제작하는 서비스를 가정하고, 공개 화면과 일반적인 서비스 구조를 바탕으로 서버와 네트워크 보안을 설계했습니다. Team EGG, 5명.</p>
+        <p style="margin-top:12px"><span class="award">1차 프로젝트 1등, 2026.07.01 상장</span></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="label">맡은 일</div>
+      <div class="body">
+        <p><b>서비스 흐름과 보안 분석</b>을 맡았습니다.</p>
+        <ul class="list" style="margin-top:10px">
+          <li>로그인 이후 사용자 식별부터 주문 제작까지의 흐름을 단계별 시퀀스로 분석했습니다.</li>
+          <li>클라이언트가 보낸 가격과 옵션을 믿지 않고 서버 기준으로 다시 검증하는 흐름을 정리했습니다.</li>
+          <li>주문 후보, 결제 승인, 제작 요청 사이에서 데이터가 바뀌지 않는지 검토하고, 결제 승인과 주문 확정 시퀀스와 제작 슬롯 임시 예약 해제 조건을 고쳤습니다.</li>
+          <li>단계마다 OWASP Top 10 위험을 연결하고 인프라 정책으로 이어지게 했습니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="techhive">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">Project 03<br>2026.09.22 ~ 10.13</div>
+      <div>
+        <h2>TechHive 디지털 포렌식 분석</h2>
+        <p class="sub">회사 소스코드를 가져가 새 사업을 시작했다는 시나리오에서, BitLocker로 암호화된 노트북 이미지 하나로 활동을 재구성했습니다. 4명, 최종 보고서 85쪽, 상세 분석 41개 중 14개 담당.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="label">맡은 일</div>
+      <div class="body">
+        <p><b>웹과 클라우드 영역 분석</b>(브라우저 기록, 다운로드, Dropbox)과 Dropbox와 USB를 함께 쓴 이유 분석, 10월 5일부터 팀 통합 보고서의 수정과 검수를 맡았습니다.</p>
+        <ul class="list" style="margin-top:10px">
+          <li>WebCacheV01.dat가 한 도구에서 열리지 않자 손상으로 단정하지 않고 다른 파서로 74개 테이블을 읽었습니다.</li>
+          <li>이름과 크기가 같은데 해시가 다른 CSV 두 개를 Git 첫 커밋과 연결해, 차이가 대소문자 3바이트임을 밝혔습니다.</li>
+          <li>Chrome의 LevelDB에서 지워진 다운로드 기록 7건을 복원했습니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="learning">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">Learning<br>2026.05.27 ~ 10.13</div>
+      <div>
+        <h2>설치 기록으로 본 학습 흐름</h2>
+        <p class="sub">이 노트북의 Windows 이벤트 로그(MsiInstaller)와 레지스트리의 프로그램 설치 날짜를 읽어, 언제 어떤 도구를 들였는지 다시 맞췄습니다.</p>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="tl"><div class="d">05.27</div><div class="c"><b>과정 시작</b>, 컴퓨터와 네트워크 기초</div></div>
+      <div class="tl"><div class="d">06.05 ~ 06.12</div><div class="c"><b>가상화와 Linux 실습</b><div class="tools">VMware Workstation, PuTTY</div></div></div>
+      <div class="tl proj"><div class="d">06.18 ~ 07.01</div><div class="c"><b>1차 프로젝트</b>, 인프라 보안 설계</div></div>
+      <div class="tl"><div class="d">07.03 ~ 07.14</div><div class="c"><b>Nginx, DB, OPNsense</b><div class="tools">HeidiSQL, WireGuard</div></div></div>
+      <div class="tl proj"><div class="d">08.02 ~ 08.25</div><div class="c"><b>2차 프로젝트</b>, 보안 인프라 구축과 운영<div class="tools">Node.js, Pandoc, Java(ZAP 실행 환경, 08.13 고강도 검증일)</div></div></div>
+      <div class="tl"><div class="d">08.26 ~ 08.31</div><div class="c"><b>디지털 포렌식 Part 1, 2</b>, 레지스트리와 데이터 유출 사건<div class="tools">FTK Imager, Autopsy, OSFMount, VirtualBox, DB Browser for SQLite</div></div></div>
+      <div class="tl"><div class="d">09.04 ~ 09.10</div><div class="c"><b>Part 3, 4</b>, Linux 웹 서버 침해와 Windows 침해<div class="tools">Git, WSL(Plaso), Microsoft Message Analyzer</div></div></div>
+      <div class="tl"><div class="d">09.16 ~ 09.21</div><div class="c"><b>Part 6</b>, 메모리 포렌식과 Local LLM<div class="tools">Volatility 2 (PowerShell 기록 67회)</div></div></div>
+      <div class="tl proj"><div class="d">09.22 ~ 10.13</div><div class="c"><b>3차 프로젝트</b>, 디지털 포렌식 분석</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="skills">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">Skills</div>
+      <div><h2>다뤄 본 기술</h2></div>
+    </div>
+    <div class="skills">
+      <div><b>네트워크와 보안 인프라</b>OPNsense, WireGuard, PF 방화벽, Unbound, Nginx 리버스 프록시, ACME 인증서</div>
+      <div><b>탐지와 로그</b>NAXSI, Suricata, Graylog, OpenSearch, Filebeat, OWASP ZAP</div>
+      <div><b>서버와 운영</b>Ubuntu, MariaDB, VMware, VirtualBox, WSL, Docker, 백업 자동화와 GPG</div>
+      <div><b>디지털 포렌식</b>Autopsy, FTK Imager, NTFS 로그 분석, Plaso, Timesketch, Volatility</div>
+      <div><b>스크립트</b>Python, PowerShell, Bash</div>
+      <div><b>문서와 협업</b>WBS, 보고서 통합, 발표 구성, 시연 영상 편집</div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">윤해성, 이스트캠프 가디언즈 정보보호 및 보안 인프라 운영 관리 과정 (인프라 보안 12기), 2026</div>
+</footer>
+</body>
+</html>
